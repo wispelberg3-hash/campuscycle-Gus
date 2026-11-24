@@ -24,17 +24,17 @@ export type BookingField = Exclude<keyof BookingValues, 'repairs'>
 export type BookingResult =
   | { ok: true; bookingId: number }
   | {
-      ok: false
-      // One sentence for the top of the form.
-      message: string
-      // The first field with a problem (the form links to it), and the problem of each field.
-      field?: BookingField
-      errors?: Partial<Record<BookingField, string>>
-      values: BookingValues
-      // Only set by the form itself (BookingForm.tsx) when the server could not be reached: the
-      // booking may or may not have been saved.
-      lost?: true
-    }
+    ok: false
+    // One sentence for the top of the form.
+    message: string
+    // The first field with a problem (the form links to it), and the problem of each field.
+    field?: BookingField
+    errors?: Partial<Record<BookingField, string>>
+    values: BookingValues
+    // Only set by the form itself (BookingForm.tsx) when the server could not be reached: the
+    // booking may or may not have been saved.
+    lost?: true
+  }
 
 // What createBooking needs from outside: the database (Payload), the device's address for the rate
 // limit, and the current time (a test can pretend another one). member: the id of the member who is
@@ -176,7 +176,7 @@ async function checkAndSave(formData: FormData, context: BookingContext): Promis
 
   // W6: switch on the repair choice. Remove the // in front of the next line, and of `repairs,` in
   // payload.create below. It keeps only whole numbers, the ids of the repairs the user ticked.
-  // const repairs = formData.getAll('repairs').map(Number).filter(Number.isInteger)
+  const repairs = formData.getAll('repairs').map(Number).filter(Number.isInteger)
 
   // 1. The trap field. The message says only that the booking was not saved: a program that filled
   // the trap learns nothing about why.
@@ -215,7 +215,7 @@ async function checkAndSave(formData: FormData, context: BookingContext): Promis
         requestId,
         // The logged-in member, never anything the form sends: only with the members' area on.
         member: membersAreaOn() ? context.member : undefined,
-        // repairs,
+        repairs,
       },
       overrideAccess: true,
     })
